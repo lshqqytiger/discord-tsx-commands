@@ -1,6 +1,6 @@
 {
   "name": "discord-tsx-commands",
-  "version": "0.2.13",
+  "version": "0.2.13-a",
   "description": "Write Discord.js commands in tsx without React. An extension package for discord-tsx-factory.",
   "main": "dist/index.js",
   "repository": "https://github.com/lshqqytiger/discord-tsx-commands.git",
