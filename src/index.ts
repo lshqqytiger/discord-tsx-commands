@@ -124,7 +124,7 @@ require("discord-tsx-factory").createElement = function createElement(
       if (props.dmPermission) element.setDMPermission(props.dmPermission);
       if (props.defaultMemberPermissions)
         element.setDefaultMemberPermissions(props.defaultMemberPermissions);
-      for (const child of props.children)
+      for (const child of props.children.flat(Infinity))
         if (child instanceof Discord.SlashCommandBuilder)
           // slash > slash
           element.addSubcommand((sub) => {
@@ -162,7 +162,7 @@ require("discord-tsx-factory").createElement = function createElement(
     case "group":
       const group = new Discord.SlashCommandSubcommandGroupBuilder();
       setNameAndDescription(group, props);
-      for (const child of props.children)
+      for (const child of props.children.flat(Infinity))
         group.addSubcommand((sub) => {
           setNameAndDescription(sub, child);
           const listener = Factory.getListener(`command_slash_${child.name}`);
@@ -219,7 +219,7 @@ require("discord-tsx-factory").createElement = function createElement(
     case "integer":
     case "number":
       {
-        props.choices ||= props.children || [];
+        props.choices ||= props.children.flat(Infinity) || [];
         const option = new Discord.SlashCommandNumberOption();
         if (props.choices.length) option.setChoices(...props.choices);
         element = setNameAndDescription(option, props);
@@ -227,7 +227,7 @@ require("discord-tsx-factory").createElement = function createElement(
       break;
     case "string":
       {
-        props.choices ||= props.children || [];
+        props.choices ||= props.children.flat(Infinity) || [];
         const option = new Discord.SlashCommandStringOption();
         if (props.choices.length) option.setChoices(...props.choices);
         element = setNameAndDescription(option, props);
