@@ -6,7 +6,7 @@ Write Discord.js commands in tsx.
 
 `discord-tsx-commands` requires `discord-tsx-factory` and `discord.js`.
 
-`discord-tsx-commands` is compatible with `discord-tsx-factory` version `0.2.13` and `discord.js` version `14.7.0`. (See `peerDependencies`)
+`discord-tsx-commands` is compatible with `discord-tsx-factory` version `0.2.13 - 0.2.14` and `discord.js` version `14.7.0 - 14.7.1`. (See `peerDependencies`)
 
 ```tsx
 import { createElement, Fragment, Client } from "discord-tsx-factory";
@@ -21,13 +21,13 @@ const client = new Client(...);
 Using npm
 
 ```bash
-$ npm install --save discord.js@14.7.0 discord-tsx-factory discord-tsx-commands
+$ npm install --save discord.js@14.7.1 discord-tsx-factory discord-tsx-commands
 ```
 
 Using yarn
 
 ```bash
-$ yarn add discord.js@14.7.0 discord-tsx-factory discord-tsx-commands
+$ yarn add discord.js@14.7.1 discord-tsx-factory discord-tsx-commands
 ```
 
 You need to modify your tsconfig.json to use `discord-tsx-factory`:
