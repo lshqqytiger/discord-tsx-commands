@@ -21,11 +21,11 @@
   "homepage": "https://github.com/lshqqytiger/discord-tsx-commands#readme",
   "devDependencies": {
     "@types/node": "^18.11.9",
-    "discord-tsx-factory": "^0.2.14",
-    "discord.js": "^14.7.1"
+    "discord-tsx-factory": "0.2.15",
+    "discord.js": "14.8.0"
   },
   "peerDependencies": {
-    "discord-tsx-factory": "0.2.13 - 0.2.14",
-    "discord.js": "14.7.0 - 14.7.1"
+    "discord-tsx-factory": "0.2.13 - 0.2.15",
+    "discord.js": "14.7.0 - 14.8.0"
   }
 }
