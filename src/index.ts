@@ -257,8 +257,8 @@ require("discord-tsx-factory").Client = class Client extends Discord.Client {
     if (interaction.isCommand()) {
       const data = interaction.options.data[0];
       let id = `command_slash_${interaction.commandName}`;
-      function iterateCommandData(sub: IterableCommandData): void {
-        if (!sub.options) return;
+      function iterateCommandData(sub?: IterableCommandData): void {
+        if (!sub || !sub.options) return;
         id += `_${sub.name}`;
         switch (sub.type) {
           case 1:
