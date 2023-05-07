@@ -31,7 +31,7 @@ declare module "discord-tsx-factory" {
 declare global {
   namespace JSX {
     interface ChildrenResolvable {
-      slash:
+      slash: (
         | Discord.SlashCommandAttachmentOption
         | Discord.SlashCommandBooleanOption
         | Discord.SlashCommandChannelOption
@@ -41,13 +41,14 @@ declare global {
         | Discord.SlashCommandRoleOption
         | Discord.SlashCommandStringOption
         | Discord.SlashCommandUserOption
-        | Discord.SlashCommandBuilder;
-      group: Discord.SlashCommandBuilder;
-      integer: Discord.ApplicationCommandOptionChoiceData<number>;
-      number: Discord.ApplicationCommandOptionChoiceData<number>;
-      string: Discord.ApplicationCommandOptionChoiceData<string>;
+        | Discord.SlashCommandBuilder
+      )[];
+      group: Discord.SlashCommandBuilder[];
+      integer: Discord.ApplicationCommandOptionChoiceData<number>[];
+      number: Discord.ApplicationCommandOptionChoiceData<number>[];
+      string: Discord.ApplicationCommandOptionChoiceData<string>[];
     }
-    interface IntrinsicElements {
+    interface IntrinsicProps {
       slash: OptionToElementProps<
         Omit<
           Discord.SlashCommandBuilder,
@@ -102,7 +103,10 @@ require("discord-tsx-factory").createElement = function createElement(
 ) {
   const isElementCreated = originalCreateElement(tag, _props, ...children);
   if (isElementCreated) return isElementCreated;
-  const props: Exclude<JSX.IntrinsicProps[keyof JSX.IntrinsicProps], string> = {
+  const props: Exclude<
+    JSX.IntrinsicInternalElements[keyof JSX.IntrinsicInternalElements],
+    string
+  > = {
     ..._props,
     _tag: tag,
     children,
@@ -174,7 +178,7 @@ require("discord-tsx-factory").createElement = function createElement(
         });
       return group;
     case "choice":
-      props.value ||= props.children.join("");
+      props.value ||= props.children?.join("");
       return props;
     case "attachment":
       element = setBuilderProperties(
