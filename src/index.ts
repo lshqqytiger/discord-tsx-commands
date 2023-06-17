@@ -1,83 +1,13 @@
 import * as Discord from "discord.js";
 import * as Factory from "discord-tsx-factory";
+import { InteractionType } from "discord-tsx-factory/dist/enums";
 
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
-type OptionToElementProps<T> = Partial<
-  Pick<
-    T,
-    {
-      [K in keyof T]: T[K] extends Function ? never : K;
-    }[keyof T]
-  >
-> & {
-  name: string;
-  description: string;
-};
+import "./declarations";
+
 interface IterableCommandData {
   name: string;
   type: Discord.ApplicationCommandOptionType;
   options?: IterableCommandData[];
-}
-
-declare module "discord-tsx-factory" {
-  export enum InteractionType {
-    Slash,
-  }
-  export type CommandInteractionHandler = (
-    interaction: Discord.CommandInteraction
-  ) => any;
-}
-
-declare global {
-  namespace JSX {
-    interface ChildrenResolvable {
-      slash: (
-        | Discord.SlashCommandAttachmentOption
-        | Discord.SlashCommandBooleanOption
-        | Discord.SlashCommandChannelOption
-        | Discord.SlashCommandIntegerOption
-        | Discord.SlashCommandMentionableOption
-        | Discord.SlashCommandNumberOption
-        | Discord.SlashCommandRoleOption
-        | Discord.SlashCommandStringOption
-        | Discord.SlashCommandUserOption
-        | Discord.SlashCommandBuilder
-      )[];
-      group: Discord.SlashCommandBuilder[];
-      integer: Discord.ApplicationCommandOptionChoiceData<number>[];
-      number: Discord.ApplicationCommandOptionChoiceData<number>[];
-      string: Discord.ApplicationCommandOptionChoiceData<string>[];
-    }
-    interface IntrinsicProps {
-      slash: OptionToElementProps<
-        Omit<
-          Discord.SlashCommandBuilder,
-          "dm_permission" | "default_member_permissions"
-        > & {
-          dmPermission: Discord.SlashCommandBuilder["dm_permission"];
-          defaultMemberPermissions: Discord.SlashCommandBuilder["default_member_permissions"];
-        }
-      > & { onExecute?: Factory.CommandInteractionHandler };
-      group: OptionToElementProps<Discord.SlashCommandSubcommandGroupBuilder>;
-      choice: Partial<Discord.ApplicationCommandOptionChoiceData> & {
-        name: string;
-        value?: string | number;
-        children?: (string | number)[];
-      };
-
-      attachment: OptionToElementProps<Discord.SlashCommandAttachmentOption>;
-      boolean: OptionToElementProps<Discord.SlashCommandBooleanOption>;
-      channel: OptionToElementProps<Discord.SlashCommandChannelOption>;
-      integer: OptionToElementProps<
-        Writeable<Discord.SlashCommandIntegerOption>
-      >;
-      mentionable: OptionToElementProps<Discord.SlashCommandMentionableOption>;
-      number: OptionToElementProps<Writeable<Discord.SlashCommandNumberOption>>;
-      role: OptionToElementProps<Discord.SlashCommandRoleOption>;
-      string: OptionToElementProps<Writeable<Discord.SlashCommandStringOption>>;
-      user: OptionToElementProps<Discord.SlashCommandUserOption>;
-    }
-  }
 }
 
 const originalCreateElement = Factory.createElement;
@@ -96,38 +26,25 @@ function addOption(
   element.options.push(option);
   return element;
 }
-require("discord-tsx-factory").createElement = function createElement(
-  tag: keyof JSX.IntrinsicElements | Function,
-  _props: any,
-  ...children: any[]
-) {
-  const isElementCreated = originalCreateElement(tag, _props, ...children);
-  if (isElementCreated) return isElementCreated;
-  const props: Exclude<
-    JSX.IntrinsicInternalElements[keyof JSX.IntrinsicInternalElements],
-    string
-  > = {
-    ..._props,
-    _tag: tag,
-    children,
-  };
-  let element: Discord.SlashCommandBuilder | undefined;
+function ElementBuilder(
+  props: JSX.IntrinsicInternalElements[JSX.IntrinsicKeys]
+): JSX.Element | undefined {
   switch (props._tag) {
-    case "slash":
+    case "slash": {
       if (props.onExecute)
         Factory.setListener(
           `command_slash_${props.name}`,
-          new Factory.Listener(props.onExecute, Factory.InteractionType.Slash)
+          new Factory.Listener(props.onExecute, InteractionType.Slash)
         );
-      element = new Discord.SlashCommandBuilder();
-      setBuilderProperties(element, props);
-      if (props.dmPermission) element.setDMPermission(props.dmPermission);
+      const $ = new Discord.SlashCommandBuilder();
+      setBuilderProperties($, props);
+      if (props.dmPermission) $.setDMPermission(props.dmPermission);
       if (props.defaultMemberPermissions)
-        element.setDefaultMemberPermissions(props.defaultMemberPermissions);
+        $.setDefaultMemberPermissions(props.defaultMemberPermissions);
       for (const child of props.children.flat(Infinity))
         if (child instanceof Discord.SlashCommandBuilder)
           // slash > slash
-          element.addSubcommand((sub) => {
+          $.addSubcommand((sub) => {
             setBuilderProperties(sub, child);
             const listener = Factory.getListener(`command_slash_${child.name}`);
             if (listener) {
@@ -156,14 +73,15 @@ require("discord-tsx-factory").createElement = function createElement(
               );
             }
           }
-          element.addSubcommandGroup(child);
-        } else addOption(element, child);
-      break;
-    case "group":
-      const group = new Discord.SlashCommandSubcommandGroupBuilder();
-      setBuilderProperties(group, props);
+          $.addSubcommandGroup(child);
+        } else addOption($, child);
+      return $;
+    }
+    case "group": {
+      const $ = new Discord.SlashCommandSubcommandGroupBuilder();
+      setBuilderProperties($, props);
       for (const child of props.children.flat(Infinity))
-        group.addSubcommand((sub) => {
+        $.addSubcommand((sub) => {
           setBuilderProperties(sub, child);
           const listener = Factory.getListener(`command_slash_${child.name}`);
           if (listener) {
@@ -176,68 +94,67 @@ require("discord-tsx-factory").createElement = function createElement(
           for (const option of child.options) addOption(sub, option);
           return sub;
         });
-      return group;
+      return $;
+    }
     case "choice":
       props.value ||= props.children?.join("");
-      return props;
+      return props as Discord.ApplicationCommandOptionChoiceData;
     case "attachment":
-      element = setBuilderProperties(
+      return setBuilderProperties(
         new Discord.SlashCommandAttachmentOption(),
         props
       );
-      break;
     case "boolean":
-      element = setBuilderProperties(
+      return setBuilderProperties(
         new Discord.SlashCommandBooleanOption(),
         props
       );
-      break;
     case "channel":
-      element = setBuilderProperties(
+      return setBuilderProperties(
         new Discord.SlashCommandChannelOption(),
         props
       );
-      break;
     case "mentionable":
-      element = setBuilderProperties(
+      return setBuilderProperties(
         new Discord.SlashCommandMentionableOption(),
         props
       );
-      break;
     case "role":
-      element = setBuilderProperties(
-        new Discord.SlashCommandRoleOption(),
-        props
-      );
-      break;
+      return setBuilderProperties(new Discord.SlashCommandRoleOption(), props);
     case "user":
-      element = setBuilderProperties(
-        new Discord.SlashCommandUserOption(),
-        props
-      );
-      break;
+      return setBuilderProperties(new Discord.SlashCommandUserOption(), props);
     case "integer":
-    case "number":
-      {
-        props.choices ||= props.children.flat(Infinity);
-        const option = new Discord.SlashCommandNumberOption();
-        if (props.choices.length) option.setChoices(...props.choices);
-        element = setBuilderProperties(option, props);
-      }
-      break;
-    case "string":
-      {
-        props.choices ||= props.children.flat(Infinity);
-        const option = new Discord.SlashCommandStringOption();
-        if (props.choices.length) option.setChoices(...props.choices);
-        element = setBuilderProperties(option, props);
-      }
-      break;
+    case "number": {
+      props.choices ||= props.children.flat(Infinity);
+      const $ = new Discord.SlashCommandNumberOption();
+      if (props.choices.length) $.setChoices(...props.choices);
+      return setBuilderProperties($, props);
+    }
+    case "string": {
+      props.choices ||= props.children.flat(Infinity);
+      const $ = new Discord.SlashCommandStringOption();
+      if (props.choices.length) $.setChoices(...props.choices);
+      return setBuilderProperties($, props);
+    }
   }
-  return element;
+}
+require("discord-tsx-factory").createElement = function createElement<
+  T extends JSX.IntrinsicKeys
+>(
+  tag: T | Function,
+  props: JSX.IntrinsicElement<T>,
+  ...children: JSX.ChildResolvable[T][]
+): JSX.Element | Factory.Component | undefined {
+  if (!props || !props.children) props = { ...props, children };
+  const isElementCreated = originalCreateElement(tag, props, ...children);
+  if (isElementCreated) return isElementCreated;
+  return ElementBuilder({
+    ...props,
+    _tag: tag,
+  } as JSX.IntrinsicInternalElements[JSX.IntrinsicKeys]);
 };
 require("discord-tsx-factory").Client = class Client extends Discord.Client {
-  private _once: Factory.InteractionType[] = [Factory.InteractionType.Modal];
+  private _once: InteractionType[] = [InteractionType.Modal];
   public readonly defaultInteractionCreateListener = (
     interaction: Discord.Interaction
   ) => {
@@ -273,9 +190,7 @@ require("discord-tsx-factory").Client = class Client extends Discord.Client {
       interactionListener.listener(interaction);
     }
   };
-  constructor(
-    options: Discord.ClientOptions & { once?: Factory.InteractionType[] }
-  ) {
+  constructor(options: Discord.ClientOptions & { once?: InteractionType[] }) {
     super(options);
 
     this.on("interactionCreate", this.defaultInteractionCreateListener);

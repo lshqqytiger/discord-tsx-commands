@@ -6,7 +6,7 @@ Write Discord.js commands in tsx.
 
 `discord-tsx-commands` requires `discord-tsx-factory` and `discord.js`.
 
-`discord-tsx-commands` is compatible with `discord-tsx-factory` version `0.2.13 - 0.2.15-a` and `discord.js` version `14.7.0 - 14.8.0`. (See `peerDependencies`)
+`discord-tsx-commands` is compatible with `discord-tsx-factory` version `0.2.19-a` and `discord.js` version `14.10.0 - 14.11.0`. (See `peerDependencies`)
 
 ```tsx
 import { createElement, Fragment, Client } from "discord-tsx-factory";
@@ -21,13 +21,13 @@ const client = new Client(...);
 Using npm
 
 ```bash
-$ npm install --save discord.js@14.8.0 discord-tsx-factory discord-tsx-commands
+$ npm install --save discord.js@14.11.0 discord-tsx-factory discord-tsx-commands
 ```
 
 Using yarn
 
 ```bash
-$ yarn add discord.js@14.8.0 discord-tsx-factory discord-tsx-commands
+$ yarn add discord.js@14.11.0 discord-tsx-factory discord-tsx-commands
 ```
 
 You need to modify your tsconfig.json to use `discord-tsx-factory`:
@@ -66,7 +66,7 @@ const client = new Client({
 });
 
 client.on("ready", () => {
-  const commands: Discord.SlashCommandBuilder[] = [
+  const commands = [
     <slash
     name="command"
     description="your command"
@@ -75,7 +75,7 @@ client.on("ready", () => {
       <user name="user" description="your user" required />
       <role name="role" description="your role" required />
     </slash>
-  ];
+  ] as Discord.SlashCommandBuilder[];
   client.rest.put(Discord.Routes.applicationCommands(client.application!.id!), {
     body: commands.map((command) => command.toJSON()),
   });
@@ -91,7 +91,7 @@ Just use `slash`.
 
 ```tsx
 client.on("ready", () => {
-  const commands: Discord.SlashCommandBuilder[] = [
+  const commands = [
     <slash name="command" description="your command">
       <slash
         name="subcommand1"
@@ -114,7 +114,7 @@ client.on("ready", () => {
         <role name="role" description="your role" required />
       </slash>
     </slash>,
-  ];
+  ] as Discord.SlashCommandBuilder[];
   client.rest.put(Discord.Routes.applicationCommands(client.application!.id!), {
     body: commands.map((command) => command.toJSON()),
   });
@@ -125,7 +125,7 @@ client.on("ready", () => {
 
 ```tsx
 client.on("ready", () => {
-  const commands: Discord.SlashCommandBuilder[] = [
+  const commands = [
     <slash name="command" description="your command">
       <group name="sub1" description="sub1">
         <slash
@@ -140,7 +140,7 @@ client.on("ready", () => {
         />
       </group>
     </slash>,
-  ];
+  ] as Discord.SlashCommandBuilder[];
   client.rest.put(Discord.Routes.applicationCommands(client.application!.id!), {
     body: commands.map((command) => command.toJSON()),
   });
