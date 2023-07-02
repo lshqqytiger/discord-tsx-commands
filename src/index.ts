@@ -1,5 +1,7 @@
 import * as Discord from "discord.js";
 import * as Factory from "discord-tsx-factory";
+import { Listener } from "discord-tsx-factory/dist/interaction-listener";
+import { FunctionComponent } from "discord-tsx-factory/dist/function-component";
 import { InteractionType } from "discord-tsx-factory/dist/enums";
 
 import "./declarations";
@@ -34,7 +36,7 @@ function ElementBuilder(
       if (props.onExecute)
         Factory.setListener(
           `command_slash_${props.name}`,
-          new Factory.Listener(props.onExecute, InteractionType.Slash)
+          new Listener(props.onExecute, InteractionType.Slash)
         );
       const $ = new Discord.SlashCommandBuilder();
       setBuilderProperties($, props);
@@ -141,7 +143,10 @@ function ElementBuilder(
 require("discord-tsx-factory").createElement = function createElement<
   T extends JSX.IntrinsicKeys
 >(
-  tag: T | Function,
+  tag:
+    | T
+    | typeof Factory.Component
+    | FunctionComponent<JSX.IntrinsicElement<T>>,
   props: JSX.IntrinsicElement<T>,
   ...children: JSX.ChildResolvable[T][]
 ): JSX.Element | Factory.Component | undefined {
@@ -151,7 +156,7 @@ require("discord-tsx-factory").createElement = function createElement<
   return ElementBuilder({
     ...props,
     _tag: tag,
-  } as JSX.IntrinsicInternalElements[JSX.IntrinsicKeys]);
+  } as JSX.IntrinsicInternalElements[T]);
 };
 require("discord-tsx-factory").Client = class Client extends Discord.Client {
   private _once: InteractionType[] = [InteractionType.Modal];
