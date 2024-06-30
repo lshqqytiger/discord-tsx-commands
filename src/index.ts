@@ -6,19 +6,15 @@ import { InteractionType } from "discord-tsx-factory/dist/enums";
 
 import "./declarations";
 
-interface IterableCommandData {
-  name: string;
-  type: Discord.ApplicationCommandOptionType;
-  options?: IterableCommandData[];
-}
-
 const originalCreateElement = Factory.createElement;
 function setBuilderProperties(builder: any, props: any) {
   builder.setName(props.name).setDescription(props.description);
-  if (props.name_localizations)
+  if (props.name_localizations) {
     builder.setNameLocalizations(props.name_localizations);
-  if (props.description_localizations)
+  }
+  if (props.description_localizations) {
     builder.setDescriptionLocalizations(props.description_localizations);
+  }
   return builder;
 }
 function addOption(
@@ -33,18 +29,22 @@ function ElementBuilder(
 ): JSX.Element | undefined {
   switch (props._tag) {
     case "slash": {
-      if (props.onExecute)
+      if (props.onExecute) {
         Factory.setListener(
           `command_slash_${props.name}`,
           new Listener(props.onExecute, InteractionType.Slash)
         );
+      }
       const $ = new Discord.SlashCommandBuilder();
       setBuilderProperties($, props);
-      if (props.dmPermission) $.setDMPermission(props.dmPermission);
-      if (props.defaultMemberPermissions)
+      if (props.dmPermission) {
+        $.setDMPermission(props.dmPermission);
+      }
+      if (props.defaultMemberPermissions) {
         $.setDefaultMemberPermissions(props.defaultMemberPermissions);
-      for (const child of props.children.flat(Infinity))
-        if (child instanceof Discord.SlashCommandBuilder)
+      }
+      for (const child of props.children.flat(Infinity)) {
+        if (child instanceof Discord.SlashCommandBuilder) {
           // slash > slash
           $.addSubcommand((sub) => {
             setBuilderProperties(sub, child);
@@ -56,10 +56,14 @@ function ElementBuilder(
                 listener
               );
             }
-            for (const option of child.options) addOption(sub, option);
+            for (const option of child.options) {
+              addOption(sub, option);
+            }
             return sub;
           });
-        else if (child instanceof Discord.SlashCommandSubcommandGroupBuilder) {
+        } else if (
+          child instanceof Discord.SlashCommandSubcommandGroupBuilder
+        ) {
           // slash > group > slash
           for (const option of child.options) {
             const listener = Factory.getListener(
@@ -76,13 +80,16 @@ function ElementBuilder(
             }
           }
           $.addSubcommandGroup(child);
-        } else addOption($, child);
+        } else {
+          addOption($, child);
+        }
+      }
       return $;
     }
     case "group": {
       const $ = new Discord.SlashCommandSubcommandGroupBuilder();
       setBuilderProperties($, props);
-      for (const child of props.children.flat(Infinity))
+      for (const child of props.children.flat(Infinity)) {
         $.addSubcommand((sub) => {
           setBuilderProperties(sub, child);
           const listener = Factory.getListener(`command_slash_${child.name}`);
@@ -93,9 +100,12 @@ function ElementBuilder(
               listener
             );
           }
-          for (const option of child.options) addOption(sub, option);
+          for (const option of child.options) {
+            addOption(sub, option);
+          }
           return sub;
         });
+      }
       return $;
     }
     case "choice":
@@ -150,13 +160,18 @@ require("discord-tsx-factory").createElement = function createElement<
   props: JSX.IntrinsicElement<T>,
   ...children: JSX.ChildResolvable[T][]
 ): JSX.Element | Factory.Component | undefined {
-  if (!props || !props.children) props = { ...props, children };
+  if (!props || !props.children) {
+    props = { ...props, children };
+  }
   const isElementCreated = originalCreateElement(tag, props, ...children);
-  if (isElementCreated) return isElementCreated;
-  return ElementBuilder({
-    ...props,
-    _tag: tag,
-  } as JSX.IntrinsicInternalElements[T]);
+  if (isElementCreated === undefined) {
+    const built = ElementBuilder({
+      ...props,
+      _tag: tag,
+    } as JSX.IntrinsicInternalElements[T]);
+    return built;
+  }
+  return isElementCreated;
 };
 require("discord-tsx-factory").Client = class Client extends Discord.Client {
   private _once: InteractionType[] = [InteractionType.Modal];
@@ -165,7 +180,9 @@ require("discord-tsx-factory").Client = class Client extends Discord.Client {
   ) => {
     if ("customId" in interaction) {
       const interactionListener = Factory.getListener(interaction.customId);
-      if (!interactionListener) return;
+      if (!interactionListener) {
+        return;
+      }
       interactionListener.listener(interaction, () =>
         Factory.deleteListener(interaction.customId)
       );
@@ -173,14 +190,19 @@ require("discord-tsx-factory").Client = class Client extends Discord.Client {
         (this._once.includes(interactionListener.type) &&
           interactionListener.once !== false) ||
         interactionListener.once
-      )
+      ) {
         Factory.deleteListener(interaction.customId);
+      }
     }
     if (interaction.isCommand()) {
-      const data = interaction.options.data[0];
+      const data = interaction.options.data.at(0);
       let id = `command_slash_${interaction.commandName}`;
-      function iterateCommandData(sub?: IterableCommandData): void {
-        if (!sub || !sub.options) return;
+      function iterateCommandData(
+        sub?: Discord.CommandInteractionOption
+      ): void {
+        if (sub === undefined || sub.options === undefined) {
+          return;
+        }
         id += `_${sub.name}`;
         switch (sub.type) {
           case 1:
@@ -191,7 +213,9 @@ require("discord-tsx-factory").Client = class Client extends Discord.Client {
       }
       iterateCommandData(data);
       const interactionListener = Factory.getListener(id);
-      if (!interactionListener) return;
+      if (!interactionListener) {
+        return;
+      }
       interactionListener.listener(interaction);
     }
   };
