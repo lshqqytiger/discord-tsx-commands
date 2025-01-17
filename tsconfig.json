@@ -1,7 +1,10 @@
 {
+  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
-    "target": "es2021",
-    "module": "commonjs",
+    "target": "ES2022",
+    "baseUrl": "./src",
+    "sourceMap": true,
+    "lib": ["ES2022"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

@@ -37,8 +37,8 @@ function ElementBuilder(
       }
       const $ = new Discord.SlashCommandBuilder();
       setBuilderProperties($, props);
-      if (props.dmPermission) {
-        $.setDMPermission(props.dmPermission);
+      if (props.contexts) {
+        $.setContexts(props.contexts);
       }
       if (props.defaultMemberPermissions) {
         $.setDefaultMemberPermissions(props.defaultMemberPermissions);

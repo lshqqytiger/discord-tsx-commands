@@ -37,9 +37,9 @@ declare global {
       slash: OptionToElementProps<
         Omit<
           Discord.SlashCommandBuilder,
-          "dm_permission" | "default_member_permissions"
+          "contexts" | "default_member_permissions"
         > & {
-          dmPermission: Discord.SlashCommandBuilder["dm_permission"];
+          contexts: Discord.SlashCommandBuilder["contexts"];
           defaultMemberPermissions: Discord.SlashCommandBuilder["default_member_permissions"];
         }
       > & { onExecute?: /*Discord.*/ CommandInteractionHandler };
