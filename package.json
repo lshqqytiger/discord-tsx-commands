@@ -1,6 +1,6 @@
 {
   "name": "discord-tsx-commands",
-  "version": "0.3.6",
+  "version": "0.3.6-a",
   "description": "Write Discord.js commands in tsx without React. An extension package for discord-tsx-factory.",
   "main": "dist/index.js",
   "repository": "https://github.com/lshqqytiger/discord-tsx-commands.git",
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/lshqqytiger/discord-tsx-commands#readme",
   "dependencies": {
-    "discord-tsx-factory": "^0.3.6",
+    "discord-tsx-factory": "^0.3.6-a",
     "discord.js": "^14.18.0"
   },
   "devDependencies": {
@@ -29,7 +29,7 @@
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "discord-tsx-factory": "^0.3.6",
+    "discord-tsx-factory": "^0.3.6-a",
     "discord.js": "14.17.0 - 14.18.0"
   }
 }

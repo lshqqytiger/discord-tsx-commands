@@ -124,10 +124,10 @@ discord-api-types@^0.37.119:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.119.tgz#29e32f635351da32dd4c92defcafdeb65156ad33"
   integrity sha512-WasbGFXEB+VQWXlo6IpW3oUv73Yuau1Ig4AZF/m13tXcTKnMpc/mHjpztIlz4+BM9FG9BHQkEXiPto3bKduQUg==
 
-discord-tsx-factory@^0.3.6:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/discord-tsx-factory/-/discord-tsx-factory-0.3.6.tgz#9801c46c88c058c0551c1fafd49378970bcd0677"
-  integrity sha512-SOZuBcNfekGCjndPvKaOCqQHBAGuP0JBMTR8ghY2FOp0quz39lCOBDe5gq7pj7ZXwX0vXI7O2PVDWH7wxTeESQ==
+discord-tsx-factory@^0.3.6-a:
+  version "0.3.6-a"
+  resolved "https://registry.yarnpkg.com/discord-tsx-factory/-/discord-tsx-factory-0.3.6-a.tgz#d6e1fb0b3235cb6e33f1b63f9bf2dfed5d521ec3"
+  integrity sha512-Uxm+zpAnl5DHR9ypTbHXLFe0bFz71I4dXkTGx6lGcj8+HTaKVAxf7FJ3RNLdLC5p7yhwncRvnBRNfL9wnM32bA==
   dependencies:
     discord.js "^14.18.0"
 
